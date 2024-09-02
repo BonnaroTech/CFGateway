@@ -1,0 +1,17 @@
+services:
+  gateway-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    ports:
+      - "5500:5500"
+    volumes:
+      - .:/app
+      - ~/.m2:/root/.m2
+    networks:
+      - ecomhub_network
+
+networks:
+  ecomhub_network:
+    name: ecomhub_services_network
