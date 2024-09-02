@@ -1,10 +1,13 @@
-FROM maven:3.9.6-eclipse-temurin-21-jammy
-
+FROM eclipse-temurin:21-jdk as build
+COPY . /app
 WORKDIR /app
+RUN ./mvnw --no-transfer-progress clean package -DskipTests
+RUN mv -f target/*.jar app.jar
 
-COPY pom.xml .
-RUN mvn dependency:go-offline
-
-COPY src ./src
-
-CMD ["mvn", "spring-boot:run"]
+FROM eclipse-temurin:21-jre
+ARG PORT
+ENV PORT=5500
+COPY --from=build /app/app.jar .
+RUN useradd runtime
+USER runtime
+ENTRYPOINT [ "java", "-Dserver.port=${PORT}", "-jar", "app.jar" ]
